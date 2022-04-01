@@ -1,5 +1,5 @@
 /* 
- * modelos de las primitivas
+ * Modelos de las primitivas
  */
 package Modelo;
 
