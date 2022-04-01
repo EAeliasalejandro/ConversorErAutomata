@@ -19,7 +19,7 @@ public class Cliente {
         //a+.(c|v).a
         //(a)|((b)*.(c)).=.a|b*.c
         //(a|b)*
-        //(a|b)*
+        //(a|b)*.b.c.d
         
         menu.setVisible(true);
     }
