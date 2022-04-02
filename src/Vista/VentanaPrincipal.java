@@ -3,10 +3,12 @@
  */
 package Vista;
 
-import Modelo.ConversorErAfnd;
+import Modelo.AutomataEmpirico;
 import Modelo.Lexer;
 import Modelo.Primitivas;
 import Modelo.Tokens;
+import Modelo.afd.AFD;
+import Modelo.afnd.AFND;
 import dk.brics.automaton.Automaton;
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,8 +30,9 @@ import javax.swing.table.DefaultTableModel;
 public class VentanaPrincipal extends javax.swing.JFrame {
 
     private ArrayList<String> transicion;
-    ArrayList<Primitivas> arq;
+    static ArrayList<Primitivas> arq;
     private ArrayList<String> alfabetoLista;
+    private AFND afnd;
     Boolean Analizado = false;
 
     //private ArrayList ;
@@ -47,23 +50,26 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         txtEntrada = new javax.swing.JTextField();
         btnAnalizar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
-        txtaAFD = new javax.swing.JTextArea();
+        txtaAFND = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
-        btnPrimitivas = new javax.swing.JButton();
+        btnAFND = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         txtaResultadoLexico = new javax.swing.JTextArea();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         lblImagen = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        tableValores = new javax.swing.JTable();
         jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        btnAFD = new javax.swing.JButton();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        txtaAFD = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setFont(new java.awt.Font("Decker", 1, 24)); // NOI18N
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel1.setText("Conversor ER - AFD - AFND");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 12, 1640, -1));
 
         txtEntrada.setFont(new java.awt.Font("Decker", 0, 14)); // NOI18N
         txtEntrada.setText("Escribe la expresión regular");
@@ -72,6 +78,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 txtEntradaMouseClicked(evt);
             }
         });
+        getContentPane().add(txtEntrada, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 83, 385, 47));
 
         btnAnalizar.setFont(new java.awt.Font("Decker", 0, 14)); // NOI18N
         btnAnalizar.setText("Analizar");
@@ -80,133 +87,70 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 btnAnalizarActionPerformed(evt);
             }
         });
+        getContentPane().add(btnAnalizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 142, -1, 37));
 
-        txtaAFD.setColumns(20);
-        txtaAFD.setFont(new java.awt.Font("Decker", 0, 14)); // NOI18N
-        txtaAFD.setRows(5);
-        jScrollPane1.setViewportView(txtaAFD);
+        txtaAFND.setColumns(20);
+        txtaAFND.setFont(new java.awt.Font("Decker", 0, 14)); // NOI18N
+        txtaAFND.setRows(5);
+        jScrollPane1.setViewportView(txtaAFND);
+
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 454, 470, 390));
 
         jLabel2.setFont(new java.awt.Font("Decker", 0, 18)); // NOI18N
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Analizador Léxico");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 48, 435, -1));
 
-        btnPrimitivas.setFont(new java.awt.Font("Decker", 0, 14)); // NOI18N
-        btnPrimitivas.setText("Convertir a automata");
-        btnPrimitivas.addActionListener(new java.awt.event.ActionListener() {
+        btnAFND.setFont(new java.awt.Font("Decker", 0, 14)); // NOI18N
+        btnAFND.setText("Convertir a AFND");
+        btnAFND.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPrimitivasActionPerformed(evt);
+                btnAFNDActionPerformed(evt);
             }
         });
+        getContentPane().add(btnAFND, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 420, -1, 37));
 
         txtaResultadoLexico.setColumns(20);
         txtaResultadoLexico.setFont(new java.awt.Font("Decker", 0, 14)); // NOI18N
         txtaResultadoLexico.setRows(5);
         jScrollPane2.setViewportView(txtaResultadoLexico);
 
+        getContentPane().add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 80, 404, 310));
+
         jLabel3.setFont(new java.awt.Font("Decker", 0, 18)); // NOI18N
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel3.setText("Estructura del autómata");
-
-        jLabel4.setFont(new java.awt.Font("Decker", 0, 18)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("Tabla de valores");
+        jLabel3.setText("Autómata Finito No Determinista con e");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 413, 470, 40));
 
         lblImagen.setText("imagenNoCargada");
         lblImagen.setVerticalAlignment(javax.swing.SwingConstants.TOP);
-
-        tableValores.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane3.setViewportView(tableValores);
+        getContentPane().add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 520, 690, 310));
 
         jLabel5.setFont(new java.awt.Font("Decker", 0, 18)); // NOI18N
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel5.setText("Autómata");
+        jLabel5.setText("Autómata Finito Determinista");
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1320, 423, 430, 30));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(19, 19, 19)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnAnalizar)
-                            .addComponent(txtEntrada, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 404, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(13, 13, 13)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
-                            .addComponent(btnPrimitivas)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 606, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 658, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(30, 30, 30)
-                                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 124, Short.MAX_VALUE)
-                                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 566, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 566, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(73, 73, 73))))))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(txtEntrada, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(btnAnalizar, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(236, 236, 236)
-                                .addComponent(btnPrimitivas, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 339, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(17, 17, 17)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 281, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(17, 17, 17)
-                        .addComponent(jLabel4)))
-                .addContainerGap(39, Short.MAX_VALUE))
-        );
+        jLabel6.setFont(new java.awt.Font("Decker", 0, 18)); // NOI18N
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText("Diagrama AFND empirico");
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 480, 660, -1));
+
+        btnAFD.setFont(new java.awt.Font("Decker", 0, 14)); // NOI18N
+        btnAFD.setText("Convertir a AFD");
+        btnAFD.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAFDActionPerformed(evt);
+            }
+        });
+        getContentPane().add(btnAFD, new org.netbeans.lib.awtextra.AbsoluteConstraints(1320, 360, -1, 37));
+
+        txtaAFD.setColumns(20);
+        txtaAFD.setFont(new java.awt.Font("Decker", 0, 14)); // NOI18N
+        txtaAFD.setRows(5);
+        jScrollPane5.setViewportView(txtaAFD);
+
+        getContentPane().add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(1320, 450, 430, 380));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -291,19 +235,14 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnAnalizarActionPerformed
 
-    private void btnPrimitivasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPrimitivasActionPerformed
-
-        ConversorErAfnd conversor = new ConversorErAfnd();
+    private void btnAFNDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAFNDActionPerformed
+        //Diagrama AFND empirico
+        AutomataEmpirico conversor = new AutomataEmpirico();
         Automaton a = conversor.convertir(txtEntrada.getText());
         String estrDise = a.toDot().replace("Automaton", "AutomataCompiladores");
-        String estrAuto = conversor.generarAutomata(a.toString());
-        txtaAFD.setText(estrAuto);
-        Object[] listaEstados = a.getStates().toArray();
-        //System.out.println(listaEstados[0].getClass());
+        //String estrAuto = conversor.generarAutomata(a.toString());
+        //txtaAFD.setText(estrAuto);
 
-        //
-        //DefaultTableModel modelo = conversor.generarModelo(listaEstados);
-        //tableValores.setModel(modelo);
         File archivo = new File("EstructuraAutomata.dot");
         PrintWriter escribir;
         try {
@@ -317,16 +256,24 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             ImagenAutomata.getImage().flush();
             Thread.sleep(2000);
             lblImagen.setIcon(ImagenAutomata);
-
         } catch (FileNotFoundException ex) {
             Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (InterruptedException ex) {
+        } catch (IOException | InterruptedException ex) {
             Logger.getLogger(VentanaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //AFND CON e
+        afnd = new AFND(txtEntrada.getText().replace(".", ""));
+        afnd.agregarAnidacion();
+        afnd.postfix();
+        afnd.erAafnd();
+        afnd.print(this.txtaAFND);
+    }//GEN-LAST:event_btnAFNDActionPerformed
 
-    }//GEN-LAST:event_btnPrimitivasActionPerformed
+    private void btnAFDActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAFDActionPerformed
+        AFD afd = new AFD(afnd.getParesDatos(), afnd.getLetra());
+        afd.crearAFD();
+        afd.imprimirAFD(this.txtaAFD);
+    }//GEN-LAST:event_btnAFDActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -361,20 +308,21 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAFD;
+    private javax.swing.JButton btnAFND;
     private javax.swing.JButton btnAnalizar;
-    private javax.swing.JButton btnPrimitivas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JLabel lblImagen;
-    private javax.swing.JTable tableValores;
     private javax.swing.JTextField txtEntrada;
     private javax.swing.JTextArea txtaAFD;
+    private javax.swing.JTextArea txtaAFND;
     private javax.swing.JTextArea txtaResultadoLexico;
     // End of variables declaration//GEN-END:variables
 }

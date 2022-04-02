@@ -6,7 +6,6 @@ package Main;
 import Vista.VentanaPrincipal;
 
 /**
- *
  * @author EAeli
  */
 public class Cliente {
